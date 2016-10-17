@@ -1,15 +1,15 @@
 {
   "name": "angular-promise-buttons",
   "description": "Fabulous helper to help you with your daily form coding.",
-  "version": "0.1.19",
+  "version": "0.1.17.1",
   "authors": [
     "Johannes Millan <johannes.millan@gmail.com>"
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/johannesjo/angular-promise-buttons.git"
+    "url": "https://github.com/cdumas22/angular-promise-buttons.git"
   },
-  "homepage": "http://johannesjo.github.io/angular-promise-buttons/",
+  "homepage": "http://cdumas.github.io/angular-promise-buttons/",
   "license": "LGPL-2.1",
   "main": "dist/angular-promise-buttons.js",
   "keywords": [
