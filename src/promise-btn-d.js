@@ -1,5 +1,5 @@
 angular.module('angularPromiseButtons')
-    .directive('promiseBtn', ['angularPromiseButtons', '$parse', '$timeout', function(angularPromiseButtons, $parse, $timeout) {
+    .directive('promiseBtn', ['angularPromiseButtons', '$parse', '$timeout', '$q', function(angularPromiseButtons, $parse, $timeout, $q) {
         'use strict';
 
         var CLICK_EVENT = 'click';
@@ -43,12 +43,24 @@ angular.module('angularPromiseButtons')
                     }
                 }
 
+                function showFinishStatus(btnEl, isSuccess) {
+                    if (cfg.btnLoadingClass) {
+                        btnEl.removeClass(cfg.btnLoadingClass);
+
+                        var cssClass = isSuccess ? cfg.btnLoadingComplete : cfg.btnLoadingFail;
+                        btnEl.addClass(cssClass);
+                        $timeout(function () {
+                            btnEl.removeClass(cssClass);
+                        }, cfg.btnLoadingCompleteReset);
+                    }
+                }
+
                 function initPromiseWatcher(watchExpressionForPromise, btnEl) {
                     // watch promise to resolve or fail
                     scope.$watch(watchExpressionForPromise, function(mVal) {
                         timeoutDone = false;
                         promiseDone = false;
-
+                        var isSuccess = false;
                         // create timeout if option is set
                         if (cfg.minDuration) {
                             timeout = $timeout(function() {
@@ -60,18 +72,26 @@ angular.module('angularPromiseButtons')
                         // for regular promises
                         if (mVal && mVal.then) {
                             handleLoading(btnEl);
-                            mVal.finally(function() {
-                                promiseDone = true;
-                                handleLoadingFinished(btnEl);
-                            });
+                            mVal.then(success, error).finally(always);
                         }
                         // for $resource
                         else if (mVal && mVal.$promise) {
                             handleLoading(btnEl);
-                            mVal.$promise.finally(function() {
-                                promiseDone = true;
-                                handleLoadingFinished(btnEl);
-                            });
+                            mVal.$promise.then(success, error).finally(always);
+                        }
+
+                        function success (response) {
+                            isSuccess = response && response.IsError ? false : true;
+                            return response; 
+                        }
+                        function error (err) {
+                            isSuccess = false;
+                            return $q.reject(err);
+                        }
+                        function always () {
+                            promiseDone = true;
+                            showFinishStatus(btnEl, isSuccess);
+                            handleLoadingFinished(btnEl);
                         }
                     });
                 }
@@ -87,7 +107,13 @@ angular.module('angularPromiseButtons')
                 }
 
                 function appendSpinnerTpl(btnEl) {
-                    btnEl.append(cfg.spinnerTpl);
+                    if (btnEl.find('.btn-spinner').length == 0) {
+                        if (scope.prepend) {
+                            btnEl.prepend(cfg.spinnerTpl);
+                        } else {
+                            btnEl.append(cfg.spinnerTpl);
+                        }
+                    }
                 }
 
                 function addHandlersForCurrentBtnOnly(btnEl) {
