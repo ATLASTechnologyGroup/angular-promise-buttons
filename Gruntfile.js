@@ -536,7 +536,7 @@ module.exports = function (grunt)
                 tagName: 'v%VERSION%',
                 tagMessage: 'Version %VERSION%',
                 push: true,
-                pushTo: 'git@github.com:johannesjo/angular-promise-buttons.git',
+                pushTo: 'git@github.com:cdumas22/angular-promise-buttons.git',
                 gitDescribeOptions: '--tags --always --abbrev=1 --dirty=-d',
                 globalReplace: false
             }
@@ -591,7 +591,7 @@ module.exports = function (grunt)
     grunt.registerTask('release', function ()
     {
         grunt.task.run([
-            'test:unitSingleRun',
+            //'test:unitSingleRun',
             'ghp',
             'bump'
         ]);
